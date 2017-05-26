@@ -1,4 +1,4 @@
-﻿//To test branch dev
+﻿//To test branch dev checkin2
 
 import { Component } from '@angular/core';
 import { NavController, AlertController } from 'ionic-angular';
