@@ -1,4 +1,6 @@
-﻿import { Component } from '@angular/core';
+﻿//To test branch dev
+
+import { Component } from '@angular/core';
 import { NavController, AlertController } from 'ionic-angular';
 import { FirebaseListObservable, AngularFireDatabase } from 'angularfire2/database';
 import { Http } from '@angular/http';
