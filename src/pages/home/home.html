@@ -1,7 +1,7 @@
 ﻿<ion-header>
   <ion-navbar>
     <ion-title>
-      Ionic Blank
+      Firebase Connection Test
     </ion-title>
   </ion-navbar>
 </ion-header>
@@ -9,7 +9,7 @@
 <ion-content padding>
   <ion-item>
     <ion-label>Search by Zipcode</ion-label>
-    <ion-input type="text" placeholder="Search for provider centered at.."
+    <ion-input type="text" placeholder="Search for providers centered at.."
                name="title"
                [(ngModel)]="inputProviderZipcode"
                required></ion-input>
@@ -30,20 +30,8 @@
 
   <ion-list>
     <ion-item *ngFor="let provider of providers | async">
-      "ID: "{{provider.provider.id}}     
-      "Name: "{{provider.provider.name}}
+      ID: {{provider.provider.id}}<br>
+      Name: {{provider.provider.name}}
     </ion-item>
   </ion-list>
-
-  <!--
-  <ion-list>
-    <ion-item *ngFor="let song of songs | async">
-      {{song.title}}
-    </ion-item>
-  </ion-list>
-  <ion-item *ngFor="let song of songs | async" (click)="showOptions(song.$key, song.title)"></ion-item>
-      -->
-    <p>
-      If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-    </p>
 </ion-content>

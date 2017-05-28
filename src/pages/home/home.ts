@@ -53,17 +53,34 @@ export class HomePage {
           });      
   }
   pushProviders(data) {
-      let providers = data.json().results;
-      console.log(providers);
-      let idM = "Mus";
-      for (let provider of providers) {
-          console.log(provider); // 1, "string", false
+      let providerResult = data.json().results;
+      console.log(providerResult);
+      for (let provider of providerResult) {
           let id = provider.id;
+          let basePrice = 50;                                 // base price for all services
+          let servicePriceMap: Map<string, number> =
+              new Map([["mri", 1000], ["dental", 50]]);       // map to store price offset for service on top of base price
+          let randomFactor = 0.7 * Math.random();             // currently scaled at 0.7 * random
+
+          /*
+          provider["services"] = {};
+
+          servicePriceMap.forEach(function (value, key) {
+              this[key] = value * randomFactor; // this.push(key + ': ' + value);
+              console.log("############LOGGING"+servicePriceMap[key]);
+              provider["services"][servicePriceMap[key]] = {};
+              provider["services"][servicePriceMap[key]] = { "noInsurance": this[key] * 1.2, "basicInsurance": this[key], "premiumInsurance": this[key] * 0.8 };
+          });
+          */
+          
+
+      //    provider["services"][servicePriceMap["mri"]] = {};
+      //    provider["services"][servicePriceMap["mri"]] = { "noInsurance": 1500, "basicInsurance": 1000, "premiumInsurance":700};
           console.log(id);
-         this.providers.push({ provider });
+          console.log("############PRINTING Provider: " + JSON.stringify(provider));
+         this.providers.push({provider });
       }
-   //   const cachedProvider = this.afdb.database.object(`/cachedCart/${uid}/${restaurantName}`);
-   //   cachedCart.set(items);
+
   }
   addSong() {
       let prompt = this.alertCtrl.create({
