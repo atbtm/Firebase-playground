@@ -14,24 +14,34 @@
                [(ngModel)]="inputProviderZipcode"
                required></ion-input>
   </ion-item>
-  <ion-buttons>
-    <button ion-button item-left  icon-only (click)="getProviders(inputProviderZipcode)">
-      <ion-icon name="eye"></ion-icon>
-    </button>
-  </ion-buttons>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-buttons>
+          <button ion-button item-left icon-only block (click)="getProviders(inputProviderZipcode)">
+            <ion-icon name="eye"></ion-icon>
+          </button>
+        </ion-buttons>
+      </ion-col>
+      <ion-col>
+        <ion-buttons>
+          <button ion-button item-right icon-only block (click)="populateDbToGrid()">
+            <ion-icon name="add"></ion-icon>
+          </button>
+        </ion-buttons>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  
 
   
 
-  <ion-buttons>
-    <button ion-button item-right icon-only (click)="addSong()">
-      <ion-icon name="add"></ion-icon>
-    </button>
-  </ion-buttons>
+  
 
   <ion-list>
-    <ion-item *ngFor="let provider of providers | async">
-      ID: {{provider.provider.id}}<br>
-      Name: {{provider.provider.name}}
+    <ion-item>
+      <pre>{{providers | json}}</pre>
     </ion-item>
   </ion-list>
 </ion-content>
