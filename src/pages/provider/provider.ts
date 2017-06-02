@@ -143,14 +143,14 @@ export class ProviderPage {
           }
           );
   }
-  getProviders(userLocation) {
+  getProviders() {
     //  this.providerList = [];
       this.providers = [];
-      let coordQuery = "https://maps.googleapis.com/maps/api/geocode/json?address=" + userLocation + "&key=AIzaSyBZmraWD9Qtku4ZxkM4eB8WvB7et2ML560";
+      let coordQuery = "https://maps.googleapis.com/maps/api/geocode/json?address=" + this.userLocation + "&key=AIzaSyBZmraWD9Qtku4ZxkM4eB8WvB7et2ML560";
       var jsonRes;
 
       this.http.get(coordQuery).subscribe(data => {
-          var lat, lng;
+      //    var lat, lng;
       //    console.log(data.json().results[0]);
           this.userLat = data.json().results[0].geometry.location.lat;
           this.userLng = data.json().results[0].geometry.location.lng;
@@ -159,15 +159,15 @@ export class ProviderPage {
           /**
            *  These are parameters that need to be passed in
            */
-          let radius = "2000";               // search radius
+          let radius = "5000";               // search radius
           let providerType = "hospital";      // facility type
     //      console.log("###userLocation: " + this.userLocation);
     //      let serviceType = "mri";            // keyword. Currently ignoring this, since mocking up service&price info
 
           let providerQuery;
-          console.log(this.userLocation);
-          console.log(this.userLat);
-          console.log(this.userLng);
+          console.log("Real location"+this.userLocation);
+          console.log("#Final lat:"+this.userLat);
+          console.log("#Final lng:" +this.userLng);
      //     if (new RegExp('^[0-9]*$').test(this.userLocation)) {
      //         console.log("#@#@$!!!!!!!!!!$$All numbers");
     //          providerQuery = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=${providerType}&key=AIzaSyBZmraWD9Qtku4ZxkM4eB8WvB7et2ML560`;
@@ -191,6 +191,8 @@ export class ProviderPage {
       }, (err) => {
           console.log(err);
           });      
+
+
   }
 
 }
