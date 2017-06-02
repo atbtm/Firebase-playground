@@ -2,6 +2,9 @@
 import { NavController, AlertController } from 'ionic-angular';
 import { Http } from '@angular/http';
 import * as firebase from "firebase";
+import { Provider } from '../../models/provider.model';
+import { Procedure } from '../../models/procedure.model';
+import { Geolocation } from '@ionic-native/geolocation';
 
 firebase.initializeApp({
     apiKey: "AIzaSyAXwqkQhaRynB_yJz1NUezgP8JoaQt1Sc0",
@@ -18,66 +21,134 @@ firebase.initializeApp({
   templateUrl: 'home.html'
 })
 export class HomePage {
-    public providers = "PlaceHolder";
+    public locationIsSet;
+    public userLat;
+    public userLng;
+    public userLocation = "Search for providers centered at..";
+    public userProcedure;
+    public providerIdArr = [];
+    public procedureList = [];
+    public providerList = [];
+    public providerId;
+    public servicePriceMap;
     engine: string;
-  // public providers = [];
+    public providers = [];
   constructor(public navCtrl: NavController, public alertCtrl: AlertController,
-      public http: Http) {
+      public http: Http, public geoloc: Geolocation) {
       this.engine = "This is engine string";
-
-      this.providers = "PlaceHolder";
+      this.servicePriceMap = new Map();
+      this.procedureList.push("mri");
+      this.servicePriceMap.set("mri", 1000);
+      this.procedureList.push("dental");
+      this.servicePriceMap.set("dental", 50);                 // map to store price offset for service on top of base price
+      this.locationIsSet = false;
+      
   }
-  
-  populateDbToGrid() {
-      var providerData;
-      // var providers = this.providers;
-      var p = firebase.database().ref('/').once('value');
+  getProviderFromFirebase(uid) {
+      var p = firebase.database().ref('providers/').once('value');
       p.then(res => {
-          console.log("###" + JSON.stringify(res.val()));
-          this.providers = res.val();
+          //this.providers = res.val();
+      //    console.log("############$$$$$" + res.val());
+      //    console.log("############$$$$$" + JSON.stringify(res.val()[uid]));
+      //    console.log("############$$$$$" + res.val()[uid]);
+          var provider = res.val()[uid];
+       //    console.log("###" + JSON.stringify(provider));
+          var jsonServices = provider.services;
+          var currProcedure;
+        //  this.procedureList.forEach(procedure => {
+          currProcedure = new Procedure(this.userProcedure, JSON.stringify(jsonServices[this.userProcedure]));
+
+       //       console.log("currProcedure " + currProcedure);
+        //  }
+        //  );
+          let currProvider = new Provider(provider.id, provider.name, provider.vicinity, provider.rating,
+              currProcedure);
+          
+          //console.log("##Logging id from obj"+currProvider.getId());
+          this.providerId = currProvider.name;
+      //    console.log(JSON.stringify(currProvider));
+          this.providerList.push(currProvider);
+         // return currProvider;
       }
       );
   }
+  public optionsFn(): void {
+
+      let procedureSelected = this.userProcedure;
+  }
   pushProviders(data) {
       let providerResult = data.json().results;
+     // console.log("#@#$@$" + JSON.stringify(providerResult));
       function genPrice(base, servicePrice, randomFactor, insuranceFactor) {
           return Math.floor((base + servicePrice * (0.8 + 0.2 * randomFactor) * insuranceFactor) * 100) / 100;
       }
+      this.providerIdArr = [];
+  //    console.log(this.providerIdArr);
       for (let provider of providerResult) {
           let id = provider.id;
 
+          this.providerIdArr.push(id);
           /**
            *  These are parameters that need to be passed in
            */
           let basePrice = 50;                                 // base price for all services
-          var servicePriceMap = new Map();
-          servicePriceMap.set("mri", 1000);
-          servicePriceMap.set("dental", 50);                 // map to store price offset for service on top of base price
           let randomFactor = Math.random();             // currently scaled at 0.7 * random
 
           provider["services"] = {};
-          var serviceItr = servicePriceMap.keys();
+          var serviceItr = this.servicePriceMap.keys();
           var nextService = serviceItr.next();
           while (nextService.value != undefined) {
               let ServiceName = nextService.value;
               provider["services"][ServiceName] = {};
               provider["services"][ServiceName] = {
-                  "noInsurance": genPrice(basePrice, servicePriceMap.get(ServiceName), randomFactor, 1.26),
-                  "basicInsurance": genPrice(basePrice, servicePriceMap.get(ServiceName), randomFactor, 1.012),
-                  "premiumInsurance": genPrice(basePrice, servicePriceMap.get(ServiceName), randomFactor, 0.74)
+                  "noInsurance": genPrice(basePrice, this.servicePriceMap.get(ServiceName), randomFactor, 1.26),
+                  "basicInsurance": genPrice(basePrice, this.servicePriceMap.get(ServiceName), randomFactor, 1.012),
+                  "premiumInsurance": genPrice(basePrice, this.servicePriceMap.get(ServiceName), randomFactor, 0.74)
               };
               nextService = serviceItr.next();
           }
           //console.log("############PRINTING Provider Str: " + JSON.stringify(provider.services));
-          firebase.database().ref('/' + id).set(provider);
+          firebase.database().ref('providers/' + id).set(provider);
 
       }
-      this.populateDbToGrid();
+      
   }
-  
-  getProviders(inputProviderZipcode) {
-      let coordQuery = "https://maps.googleapis.com/maps/api/geocode/json?address=" + inputProviderZipcode + "&key=AIzaSyBZmraWD9Qtku4ZxkM4eB8WvB7et2ML560";
+     
+  populateDbToGrid() {
+      this.providerList = [];
+      this.providerIdArr.forEach(uid => {
+          var v = this.getProviderFromFirebase(uid);
+      //    console.log("##" + v);
+    //      this.providerList.push(v);
+      })
+      console.log("##" + this.providerList);
+    //  this.providerList.push(currProvider);
+
+  }
+
+  locateMe() {
+     // this.userLocation
+      this.geoloc.getCurrentPosition()
+          .then(
+          location => {
+              this.userLocation = location.coords.latitude + ", " + location.coords.longitude;
+              this.userLat = location.coords.latitude;
+              this.userLng = location.coords.longitude;
+              this.locationIsSet = true;
+          }
+          )
+          .catch(
+          error => {
+              console.log(error);
+          }
+          );
+  }
+  getProviders(userLocation) {
+    //  this.providerList = [];
+      this.providers = [];
+      let coordQuery = "https://maps.googleapis.com/maps/api/geocode/json?address=" + userLocation + "&key=AIzaSyBZmraWD9Qtku4ZxkM4eB8WvB7et2ML560";
       var jsonRes;
+
       this.http.get(coordQuery).subscribe(data => {
           var lat, lng;
       //    console.log(data.json().results[0]);
@@ -90,13 +161,28 @@ export class HomePage {
            */
           let radius = "50000";               // search radius
           let providerType = "hospital";      // facility type
-          let serviceType = "mri";            // keyword. Currently ignoring this, since mocking up service&price info
-          let providerQuery = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=${providerType}&key=AIzaSyBZmraWD9Qtku4ZxkM4eB8WvB7et2ML560`;
-      //    console.log(providerQuery);
+    //      console.log("###userLocation: " + this.userLocation);
+    //      let serviceType = "mri";            // keyword. Currently ignoring this, since mocking up service&price info
+
+          let providerQuery;
+          console.log(this.userLocation);
+          if (new RegExp('^[0-9]*$').test(this.userLocation)) {
+              console.log("#@#@$!!!!!!!!!!$$All numbers");
+              providerQuery = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=${providerType}&key=AIzaSyBZmraWD9Qtku4ZxkM4eB8WvB7et2ML560`;
+
+          } else {
+              providerQuery = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${this.userLat},${this.userLng}&radius=${radius}&type=${providerType}&key=AIzaSyBZmraWD9Qtku4ZxkM4eB8WvB7et2ML560`;
+
+          }
+
+          this.providerIdArr = [];
+          //    console.log(providerQuery);
           this.http.get(providerQuery)
               .subscribe(data => {
                   jsonRes = data;
                   this.pushProviders(jsonRes);
+
+                  this.populateDbToGrid();
               }, (err) => {
                   console.log(err);
               });
