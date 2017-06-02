@@ -2,7 +2,7 @@
 import { Procedure } from './procedure.model';
 
 export class Provider {
-    constructor(public id: string, public name: string, public address: Address,
+    constructor(public id: string, public name: string, public lat:string, public lng:string, public address: Address,
         public rating: string, public procedures:any){//: Procedure[]) {
 
     }

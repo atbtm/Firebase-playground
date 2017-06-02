@@ -8,7 +8,7 @@ import { MyApp } from './app.component';
 import { ProviderPage } from '../pages/provider/provider';
 import { HttpModule } from '@angular/http';
 import { Geolocation } from '@ionic-native/geolocation';
-
+import { AgmCoreModule } from 'angular2-google-maps/core';
 @NgModule({
   declarations: [
     MyApp,
@@ -18,6 +18,9 @@ import { Geolocation } from '@ionic-native/geolocation';
     BrowserModule,
     IonicModule.forRoot(MyApp),
       HttpModule,
+      AgmCoreModule.forRoot({
+          apiKey: 'AIzaSyBZmraWD9Qtku4ZxkM4eB8WvB7et2ML560'
+      })
   ],
   bootstrap: [IonicApp],
   entryComponents: [

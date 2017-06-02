@@ -61,8 +61,9 @@ export class ProviderPage {
        //       console.log("currProcedure " + currProcedure);
         //  }
         //  );
-          let currProvider = new Provider(provider.id, provider.name, provider.vicinity, provider.rating,
-              currProcedure);
+          let currProvider = new Provider(provider.id, provider.name,
+              provider.geometry.location.lat, provider.geometry.location.lng,
+              provider.vicinity, provider.rating,  currProcedure);
           
           //console.log("##Logging id from obj"+currProvider.getId());
           this.providerId = currProvider.name;
@@ -183,8 +184,9 @@ export class ProviderPage {
               .subscribe(data => {
                   jsonRes = data;
                   this.pushProviders(jsonRes);
-
+                  this.locationIsSet = true;
                   this.populateDbToGrid();
+
               }, (err) => {
                   console.log(err);
               });

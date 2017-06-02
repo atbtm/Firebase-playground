@@ -49,13 +49,25 @@
         -->
     </ion-row>
   </ion-grid>
-
-
-
-      <ion-card>
-        <ion-card-header>
-          <h1>Nearby health providers..</h1>
-        </ion-card-header>
+  <ion-row *ngIf="locationIsSet">
+    <ion-col>
+      <!--40.0602746, -75.5215987-->
+      <sebm-google-map [latitude]="userLat"
+                       [longitude]="userLng"
+                       [zoom]="12">
+        <sebm-google-map-marker [latitude]="userLat" [longitude]="userLng" [label]="'ME'">
+        </sebm-google-map-marker>
+          <sebm-google-map-marker *ngFor="let provider of providerList; let i = index"
+                                  [latitude]="provider.lat" [longitude]="provider.lng" [title]="i+1">
+          </sebm-google-map-marker>
+      </sebm-google-map>
+    </ion-col>
+    </ion-row>
+    <ion-card>
+      <ion-card-header>
+        <h1>Nearby health providers..</h1>
+      </ion-card-header>
+        
         <ion-list>
           <ion-item *ngFor="let provider of providerList; let i = index">
             #{{i+1}}
@@ -67,7 +79,7 @@
             <button ion-button color="secondary">Make an appointment</button>
           </ion-item>
         </ion-list>
-      </ion-card>
+    </ion-card>
 
   <!--
       <ion-list>
